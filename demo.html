@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Demo - jquery.event.changing.js</title>
+
+        <link rel="stylesheet" href="http://www.blueprintcss.org/blueprint/screen.css" type="text/css" media="screen, projection" />
+        <link rel="stylesheet" href="http://www.blueprintcss.org/blueprint/print.css" type="text/css" media="print" /> 
+        <!--[if lt IE 8]>
+            <link rel="stylesheet" href="http://www.blueprintcss.org/blueprint/ie.css" type="text/css" media="screen, projection" />
+        <![endif]-->
+        <style type="text/css">
+            .code {
+                font-family: Consolas, Courier New, monospace;
+            }
+            input[type=text] {
+                margin-right: 10px;
+            }
+        </style>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+        <script type="text/javascript" src="jquery.event.changing.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                // Attach the "changing" event to all input elements:
+                $(":input").changing(function(e, oldVal, newVal) {
+                    // Find an appropriate element to highlight:
+                    var $this = $(this);
+                    var $parent = $(this).parent();
+                    if ($parent.is("label")) $this = $parent;
+                    
+                    $this.stop(true)
+                        .animate({backgroundColor:"#ffff33"}, 200)
+                        .animate({backgroundColor:"#ffffff"}, 2000);
+                    
+                    // Find the closest "info":
+                    while ($this.length && !$this.next(".info").length) 
+                        $this = $this.parent();
+                    $this.next(".info").text(newVal).removeClass("hide");
+                }).changing();
+            });
+        
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <fieldset class="span-22">
+                <legend>Text boxes</legend>
+
+                <label class="span-6 code">&lt;input type=&quot;text&quot; /&gt;</label>
+                <input class="span-12" type="text" value="text" />
+                <div class="span-3 last info hide"></div>
+            
+                <label class="span-6 code">&lt;textarea /&gt;</label>
+                <textarea class="span-12">textarea</textarea>
+                <span class="span-3 last info hide"></span>
+
+            </fieldset>
+            
+            <fieldset class="span-22">
+                <legend>Radios and Checkboxes</legend>
+                
+                <label class="span-6 code">&lt;input type=&quot;radio&quot; /&gt;</label>
+                <div class="span-12">
+                    <label><input type="radio" name="radio1" /> Radio A</label>
+                    <label><input type="radio" name="radio1" /> Radio B</label>
+                    <label><input type="radio" name="radio1" /> Radio C</label>
+                </div>
+                <span class="span-3 last info hide"></span>
+                
+                <label class="span-6 code">&lt;input type=&quot;checkbox&quot; /&gt;</label>
+                <div class="span-12">
+                    <label><input type="checkbox" name="check1" /> CheckBox A</label>
+                    <label><input type="checkbox" name="check2" /> CheckBox B</label>
+                    <label><input type="checkbox" name="check3" /> CheckBox C</label>
+                </div>
+                <span class="span-3 last info hide"></span>
+            </fieldset>
+            
+            <fieldset class="span-22">
+                <legend>Selects</legend>
+                
+                <label class="span-6 code">&lt;select /&gt;</label>
+                <select class="span-12">
+                    <option></option>
+                        
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                    <option>Option 3</option>
+                    <optgroup label="Option Group">
+                        <option>Option 4</option>
+                    </optgroup>
+                </select>
+                <span class="span-3 last info hide"></span>
+               
+                <label class="span-6 code">&lt;select multiple=&quot;multiple&quot; /&gt;</label>
+                <select class="span-12" multiple="multiple">
+                    <option></option>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                    <option>Option 3</option>
+                    <optgroup label="Option Group">
+                        <option>Option 4</option>
+                    </optgroup>
+                </select>
+                <span class="span-3 last info hide"></span>
+                
+
+            </fieldset>
+
+        </div>
+    </body>
+</html>
