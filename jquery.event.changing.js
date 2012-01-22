@@ -21,7 +21,7 @@
  */
 (function ($) {
     // Helper function to get the control's actual value:
-    var getVal = function(element) { return (element[0].contentEditable === 'true' ? element.html() : element.is("input[type=checkbox], input[type=radio]") ? element.is(":checked") : element.val()); };
+    var getVal = function(element) { return (element[0].contentEditable === 'true' ? element.html() : element.is("input[type=checkbox], input[type=radio]") ? element.is(":checked") : element.is("select[multiple]") ? element.val().join(",") : element.val()); };
     
     var changing = $.event.special.changing = {
         
@@ -66,7 +66,8 @@
             var element = $(this);
             var name = element.attr("name");
             // Find all radios in the same group:
-            element.closest("form")
+            var container = element.closest("form");
+            container
                 .find("input[type=radio][name='" + name + "']")
                 .each(function(){
                     changing.triggerIfChanged($(this), event);
@@ -84,8 +85,8 @@
             var current = getVal(element);
             var oldVal = element.data("lastValue");
             if (current !== oldVal) {
-                element.trigger('changing', [oldVal, current, realEvent]);
                 element.data('lastValue', current);
+                element.trigger('changing', [oldVal, current, realEvent]);
             }
         }
     };

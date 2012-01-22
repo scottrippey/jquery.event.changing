@@ -31,21 +31,23 @@
                     var $parent = $(this).parent();
                     if ($parent.is("label")) $this = $parent;
                     
+                    // Animate the background color:
                     $this.stop(true)
                         .animate({backgroundColor:"#ffff33"}, 200)
                         .animate({backgroundColor:"#ffffff"}, 2000);
                     
-                    // Find the closest "info":
+                    // Find the closest "info" and update with the current value:
                     while ($this.length && !$this.next(".info").length) 
                         $this = $this.parent();
                     $this.next(".info").text(newVal).removeClass("hide");
-                }).changing();
+                });
             });
         
         </script>
     </head>
     <body>
         <div class="container">
+            <form>
             <fieldset class="span-22">
                 <legend>Text boxes</legend>
 
@@ -109,7 +111,7 @@
                 
 
             </fieldset>
-
+            </form>
         </div>
     </body>
 </html>
