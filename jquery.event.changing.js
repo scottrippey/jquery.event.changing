@@ -20,14 +20,12 @@
  *
  */
 (function ($) {
-    // Helper function to get the control's actual value:
-    var getVal = function(element) { return (element[0].contentEditable === 'true' ? element.html() : element.is("input[type=checkbox], input[type=radio]") ? element.is(":checked") : element.is("select[multiple]") ? element.val().join(",") : element.val()); };
     
     var changing = $.event.special.changing = {
         
         setup: function (data, namespaces) {
             var element = $(this);
-            element.data('lastValue', getVal(element));
+            element.data('lastValue', changing.getInputValue(element));
 
             // Determine which events to bind to, depending on the element type:
             var events = "change", delayedEvents = "";
@@ -82,13 +80,22 @@
         },
         
         triggerIfChanged: function (element, realEvent) {
-            var current = getVal(element);
+            var current = changing.getInputValue(element);
             var oldVal = element.data("lastValue");
             if (current !== oldVal) {
                 element.data('lastValue', current);
                 element.trigger('changing', [oldVal, current, realEvent]);
             }
+        },
+        
+        // Helper function to get the control's value as a string:
+        getInputValue: function(element) {
+            return (element[0].contentEditable === 'true' ? element.html() :
+                element.is("input[type=checkbox], input[type=radio]") ? element.is(":checked") :
+                element.is("select[multiple]") ? (element.val() && element.val().join(",") || "") :
+                element.val());
         }
+
     };
     
 
@@ -119,7 +126,7 @@
             } else if (arguments.length == 1) {
                 return this.bind( 'changing', data);
             } else {
-                var val = getVal($(this));
+                var val = changing.getInputValue($(this));
                 return this.trigger( 'changing' , [val, val, null]);
             }
         }
