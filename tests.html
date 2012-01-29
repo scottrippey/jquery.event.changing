@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Tests for jquery.event.changing.js</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>
+    <link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet" type="text/css" />
+    <script src="http://code.jquery.com/qunit/qunit-git.js" type="text/javascript"></script>
+    
+    <script src="jquery.event.changing.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+        var Assert = {
+            sequenceContains: function(sequence, items, message) {
+                // Search the sequence for all items:
+                for (var i = 0; i < sequence.length; i++) {
+                    for (var j = 0; j < items.length; j++) {
+                        if (items[j] === sequence[i]) {
+                            items.splice(j, 1);
+                            break;
+                        }
+                    }
+                }
+                ok(items.length == 0, message + ": " + items);
+            }
+        };
+
+
+        $(function() {
+
+            function getEvents(element, expectedEvents) {
+                var events = [];
+                for (var event in element.data("events")) {
+                    events.push(event);
+                }
+                return events;
+            }
+
+
+            
+            module("Binding and Triggering");
+            test(".changing(...) binds to multiple events", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+
+                // Act
+                element.changing(function() { });
+                
+                // Assert
+                // Check the number of bound events:
+                var events = getEvents(element);
+                Assert.sequenceContains(events, ["changing", "change"], "The following events have been bound: " + events);
+            });
+            test(".bind('changing',...) binds to multiple events", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+
+                // Act
+                element.bind('changing', function() { });
+                
+                // Assert
+                // Check the number of bound events:
+                var events = getEvents(element);
+                Assert.sequenceContains(events, ["changing", "change"], "The following events have been bound: " + events);
+            });
+            test(".changing() triggers the event", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.changing(function() {
+                    ok(true, "Event should be fired once");
+                });
+                
+                // Act:
+                element.changing();
+                
+                // Assert
+                expect(1);
+            });
+            test(".trigger('changing') triggers the event", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.changing(function() {
+                    ok(true, "Event should be fired once");
+                });
+                
+                // Act:
+                element.trigger('changing');
+                
+                // Assert
+                expect(1);
+            });
+            test(".unbind('changing') only unbinds changing", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.bind("changing", function() {
+                    ok(false, "Changing event should have been unbound");
+                });
+                element.bind("change", function() {
+                    ok(true, "This event should still be fired");
+                });
+                
+                // Act:
+                element.unbind('changing');
+                element.val("0").trigger("change");
+
+                // Assert
+                expect(1);
+            });
+
+
+
+            module("Real Events trigger changing");
+            test("Real events trigger changing", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.changing(function() {
+                    ok(true, "Event should be fired several times");
+                });
+                
+                // Act:
+                element.val("0").trigger("change");
+                element.val("1").trigger("keyup");
+                element.val("2").trigger("blur");
+                
+                // Assert
+                expect(3);
+            });
+            test("Multiple change events don't fire duplicate changing events", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.changing(function() {
+                    ok(true, "Event should be fired only once");
+                });
+                
+                // Act:
+                element.val("0");
+                element.trigger("change");
+                element.trigger("keyup");
+                element.trigger("blur");
+                
+                // Assert
+                expect(1);
+            });
+
+            /*
+            module("Extra features: event data and namespaces");
+            test(".changing namespace", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.bind("changing.ns", function() {
+                    ok(true, "Event should be fired once");
+                });
+                
+                // Act:
+                element.val("0").trigger('changing.ns');
+                
+                // Assert
+                expect(1);
+            });
+            */
+
+
+        });
+    </script>
+</head>
+<body>
+ <h1 id="qunit-header">QUnit example</h1>
+ <h2 id="qunit-banner"></h2>
+ <div id="qunit-testrunner-toolbar"></div>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture">test markup, will be hidden</div>
+
+
+</body>
+</html>
