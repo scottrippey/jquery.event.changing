@@ -167,19 +167,19 @@
                 element.bind("changing.ns", function() {
                     ok(true, "Event should be fired once");
                 });
-                element.bind("change", function() {
+                element.bind("keyup", function() {
                     ok(true, "Event should be fired twice");
                 });
                 
                 // Act:
-                element.val("0").trigger('change');
+                element.val("0").trigger('keyup');
                 element.unbind(".ns");
-                element.val("1").trigger("change");
+                element.val("1").trigger("keyup");
                 
                 // Assert
                 // Make sure only the non-namespaced event exists:
                 var events = getEvents(element);
-                Assert.sequenceEquals(events, ["change"], "Only the change event should remain");
+                Assert.sequenceEquals(events, ["keyup"], "Only the change event should remain");
                 
                 expect(4);
             });

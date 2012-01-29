@@ -50,18 +50,6 @@
                     element.next(".info").text(text).removeClass("hide");
                 }
                 
-
-                //TEMP:
-                $(":inputx").first().each(function() {
-                    var element = $(this);
-                    var events = [];
-                    for (var event in element.data("events")) {
-                        events.push(event);
-                    }
-                    alert(element[0].toString() + ": " + events.join(", "));
-  
-                });
-                
                 
             });
         
