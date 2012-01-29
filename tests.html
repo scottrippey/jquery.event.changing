@@ -23,13 +23,29 @@
                     }
                 }
                 ok(items.length == 0, message + ": " + items);
+            },
+            sequenceEquals: function (sequence, items, message) {
+                // Make sure every item matches:
+                if (sequence.length !== items.length) {
+                    equal(sequence.length, items.length, "Sequences have different lengths");
+                    if (message) ok(false, message);
+                    return;
+                }
+                for (var i = 0; i < sequence.length || i < items.length; i++) {
+                    if (items[i] !== sequence[i]) {
+                        ok(false, "Sequences differ at index " + i + ": " + sequence[i] + " is not equal to " + items[i] + ".");
+                        if (message) ok(false, message);
+                        return;
+                    }
+                }
+                ok(true, "The sequences are the same: " + items.join(", "));
             }
         };
 
 
         $(function() {
 
-            function getEvents(element, expectedEvents) {
+            function getEvents(element) {
                 var events = [];
                 for (var event in element.data("events")) {
                     events.push(event);
@@ -143,22 +159,82 @@
                 expect(1);
             });
 
-            /*
-            module("Extra features: event data and namespaces");
+            
+            module("Extra features: Namespaces");
             test(".changing namespace", function() {
                 // Arrange
                 var element = $("<input type='text' />");
                 element.bind("changing.ns", function() {
                     ok(true, "Event should be fired once");
                 });
+                element.bind("change", function() {
+                    ok(true, "Event should be fired twice");
+                });
                 
                 // Act:
-                element.val("0").trigger('changing.ns');
+                element.val("0").trigger('change');
+                element.unbind(".ns");
+                element.val("1").trigger("change");
                 
+                // Assert
+                // Make sure only the non-namespaced event exists:
+                var events = getEvents(element);
+                Assert.sequenceEquals(events, ["change"], "Only the change event should remain");
+                
+                expect(4);
+            });
+
+            module("Extra features: event Data");
+            test("Event data is passed to event", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.changing({dataObject:true}, function(e) {
+                    ok(e.data.dataObject === true, "Changing event should receive custom data");
+                });
+                element.changing("TestData", function(e) {
+                    ok(e.data === "TestData", "Changing event should receive custom data");
+                });
+                
+                // Act
+                element.changing();
+                
+                // Assert
+                expect(2);
+            });
+
+            module("Extra features: hastext and notext");
+            test("hastext", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.val("0").bind("hastext", function(e) {
+                    ok(true, "Event should be fired once");
+                });
+
+                // Act
+                element.trigger("keyup");
+                element.val("").trigger("keyup");
+                element.val("0").trigger("keyup");
+                element.val("").trigger("keyup");
+
                 // Assert
                 expect(1);
             });
-            */
+            test("notext", function() {
+                // Arrange
+                var element = $("<input type='text' />");
+                element.val("0").bind("notext", function(e) {
+                    ok(true, "Event should be fired once");
+                });
+
+                // Act
+                element.trigger("keyup");
+                element.val("").trigger("keyup");
+                element.val("0").trigger("keyup");
+
+                // Assert
+                expect(1);
+            });
+            
 
 
         });

@@ -25,22 +25,44 @@
         <script type="text/javascript">
             $(function() {
                 // Attach the "changing" event to all input elements:
-                $(":input").changing(function(e, oldVal, newVal) {
-                    // Find an appropriate element to highlight:
+                $(":input").changing(function(e, oldVal, newVal, realEvent) {
+                    // When the element changes, Let's highlight it, and display event info:
                     var $this = $(this);
-                    var $parent = $(this).parent();
-                    if ($parent.is("label")) $this = $parent;
+                    highlightInput($this);
+                    updateInfo($this, realEvent.type + ": " + newVal);
+                });
+                
+                function highlightInput(element) {
+                    // Find an appropriate element to highlight:
+                    var $parent = element.parent();
+                    if ($parent.is("label")) element = $parent;
                     
                     // Animate the background color:
-                    $this.stop(true)
+                    element.stop(true)
                         .animate({backgroundColor:"#ffff33"}, 200)
                         .animate({backgroundColor:"#ffffff"}, 2000);
-                    
+                }
+
+                function updateInfo(element, text) {
                     // Find the closest "info" and update with the current value:
-                    while ($this.length && !$this.next(".info").length) 
-                        $this = $this.parent();
-                    $this.next(".info").text(newVal).removeClass("hide");
+                    while (element.length && !element.next(".info").length) 
+                        element = element.parent();
+                    element.next(".info").text(text).removeClass("hide");
+                }
+                
+
+                //TEMP:
+                $(":inputx").first().each(function() {
+                    var element = $(this);
+                    var events = [];
+                    for (var event in element.data("events")) {
+                        events.push(event);
+                    }
+                    alert(element[0].toString() + ": " + events.join(", "));
+  
                 });
+                
+                
             });
         
         </script>

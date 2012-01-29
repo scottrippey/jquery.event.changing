@@ -29,7 +29,7 @@
 
             // Determine which events to bind to, depending on the element type:
             var events = "change", delayedEvents = "";
-            var handler = changing.handler, delayedHandler = changing.delayedHandler;
+            var handler = changing.changeHandler, delayedHandler = changing.delayedHandler;
             if (element.is("select")) {
                 events += " keyup click";
             } else if (element.is("input[type=text], input[type=password], textarea")) {
@@ -44,19 +44,24 @@
                 handler = changing.radioHandler;
             }
 
-            // Add a namespace to events:
-            events = events.replace(/\w+/g, "$&.changing");
-            delayedEvents = delayedEvents.replace(/\w+/g, "$&.changing");
             // Bind the events:
-            element.bind(events, handler);
-            if (delayedEvents) element.bind(delayedEvents, delayedHandler);
+            namespaces.unshift("changing");
+            changing.bindHelper(element, events, data, handler, namespaces);
+            if (delayedEvents) changing.bindHelper(element, delayedEvents, data, delayedHandler, namespaces);
         },
         
         teardown: function (namespaces) {
-            $(this).unbind('.changing');
+            $(this).unbind('.changing' + namespaces);
         },
         
-        handler: function (event) {
+        bindHelper: function (element, events, data, handler, namespaces) {
+            // Add the namespaces to all events:
+            if (namespaces && namespaces.length) events = events.replace(/\w+/g, "$&." + namespaces.join("."));
+            // Fixes a binding issue with jQuery 1.6 (works in 1.5 and 1.7):
+            return (handler === undefined) ? element.bind(events, data) : element.bind(events, data, handler);
+        },
+        
+        changeHandler: function (event) {
             changing.triggerIfChanged($(this), event);
         },
         
@@ -121,13 +126,11 @@
             /// </param>
             /// <returns type="jQuery" />
             
-            if (arguments.length >= 2) {
-                return this.bind( 'changing', data, fn );
-            } else if (arguments.length == 1) {
-                return this.bind( 'changing', data);
-            } else {
-                var val = changing.getInputValue($(this));
+            if (arguments.length == 0) {
+                var val = changing.getInputValue(this);
                 return this.trigger( 'changing' , [val, val, null]);
+            } else {
+                return changing.bindHelper(this, "changing", data, fn, null);
             }
         }
     });
@@ -138,16 +141,18 @@
     var hastext = $.event.special.hastext = {
         
         setup: function (data, namespaces) {
-            $(this).bind('changing', hastext.handler);
+            namespaces.unshift("hastext");
+            changing.bindHelper($(this), 'changing', data, hastext.handler, namespaces);
         },
         
         teardown: function (namespaces) {
-            $(this).unbind('changing', hastext.handler);
+            namespaces.unshift("hastext");
+            $(this).unbind('changing.' + namespaces.join("."), hastext.handler);
         },
         
-        handler: function (event, oldVal, current, realEvent) {
+        handler: function (event, oldVal, newVal, realEvent) {
             if (oldVal === '') {
-                $(this).trigger('hastext', [oldVal, current, realEvent]);
+                $(this).trigger('hastext', [oldVal, newVal, realEvent]);
             }
         }
     };
@@ -155,16 +160,18 @@
     var notext = $.event.special.notext = {
         
         setup: function (data, namespaces) {
-            $(this).bind('changing', notext.handler);
+            namespaces.unshift("notext");
+            changing.bindHelper($(this), 'changing', data, notext.handler, namespaces);
         },
         
         teardown: function (namespaces) {
-            $(this).unbind('changing', notext.handler);
+            namespaces.unshift("notext");
+            $(this).unbind('changing.' + namespaces.join("."), notext.handler);
         },
         
-        handler: function (event, oldVal, current, realEvent) {
-            if (current === '') {
-                $(this).trigger('notext', [oldVal, current, realEvent]);
+        handler: function (event, oldVal, newVal, realEvent) {
+            if (newVal === '') {
+                $(this).trigger('notext', [oldVal, newVal, realEvent]);
             }
         }
     };    
