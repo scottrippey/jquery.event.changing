@@ -51,7 +51,8 @@
         },
         
         teardown: function (namespaces) {
-            $(this).unbind('.changing' + namespaces);
+            // 'namespaces' is inconsistent between jQuery versions, so just ignore
+            $(this).unbind('.changing');
         },
         
         bindHelper: function (element, events, data, handler, namespaces) {
@@ -146,8 +147,8 @@
         },
         
         teardown: function (namespaces) {
-            namespaces.unshift("hastext");
-            $(this).unbind('changing.' + namespaces.join("."), hastext.handler);
+            // 'namespaces' is inconsistent between jQuery versions, so just ignore
+            $(this).unbind('changing.hastext', hastext.handler);
         },
         
         handler: function (event, oldVal, newVal, realEvent) {
@@ -165,8 +166,8 @@
         },
         
         teardown: function (namespaces) {
-            namespaces.unshift("notext");
-            $(this).unbind('changing.' + namespaces.join("."), notext.handler);
+            // 'namespaces' is inconsistent between jQuery versions, so just ignore
+            $(this).unbind('changing.notext', notext.handler);
         },
         
         handler: function (event, oldVal, newVal, realEvent) {
